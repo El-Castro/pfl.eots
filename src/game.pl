@@ -1,8 +1,11 @@
 :- use_module(library(lists)).
+:- use_module(library(random)).
+:- use_module(library(ansi_term)).
 :- ensure_loaded('game_over.pl').
 :- ensure_loaded('valid_moves.pl').
 :- ensure_loaded('move.pl').
 :- ensure_loaded('display_game.pl').
+:- ensure_loaded('choose_move.pl').
 
 
 create_initial_board(Board) :-
@@ -49,35 +52,40 @@ read_move(Move) :-
 write('Enter your move as move(Row, Col, Direction, NewRow, NewCol):'),
 read(Move).
 
-game_loop(state(Board, CurrentPlayer), _GameConfig) :-
-    % Step 1: Display the current game state
+is_pc_player(white, game_config(player1(pc), _)).
+is_pc_player(black, game_config(_, player2(pc))).
+
+game_loop(state(Board, CurrentPlayer), GameConfig) :-
     display_game(state(Board, CurrentPlayer)),
 
-    % Step 2: Check if the game is over
     ( game_over(state(Board, CurrentPlayer), Winner) ->
         print_winner(Winner)
     ;
-    % Step 3: Get the current player and determine next move
-    write('Player Turn: '), write(CurrentPlayer), nl,
+        write('       Player Turn: '), write(CurrentPlayer), nl, nl,
 
-    % Step 4: Generate valid moves
-    valid_moves(state(Board, CurrentPlayer), ValidMoves),
-    ( ValidMoves = [] ->
-        write('No valid moves available. Passing turn.'), nl,
-        switch_player(CurrentPlayer, NextPlayer),
-        game_loop(state(Board, NextPlayer), _GameConfig)
-    ;
-        % Step 5: Read and validate move
-        write('Valid moves: '), write(ValidMoves), nl,
-        read_move(Move),
-        ( member(Move, ValidMoves) ->
-            % Step 6: Execute the move and update the game state
-            move(state(Board, CurrentPlayer), Move, NewGameState),
-            game_loop(NewGameState, _GameConfig)
+        valid_moves(state(Board, CurrentPlayer), ValidMoves),
+        ( ValidMoves = [] ->
+            write('No valid moves available. Passing turn.'), nl,
+            switch_player(CurrentPlayer, NextPlayer),
+            game_loop(state(Board, NextPlayer), GameConfig)
         ;
-            % Invalid move; retry
-            write('Invalid move. Try again.'), nl,
-            game_loop(state(Board, CurrentPlayer), _GameConfig)
+            % Check if the current player is human or PC
+            ( is_pc_player(CurrentPlayer, GameConfig) ->
+                write('Computer is choosing a move...'), nl,
+                choose_move(state(Board, CurrentPlayer), 1, Move),
+                write('Computer chose: '), write(Move), nl
+            ;
+                write('Valid moves: '), write(ValidMoves), nl,
+                read_move(Move)
+            ),
+            % Validate the move and proceed
+            ( member(Move, ValidMoves) ->
+                move(state(Board, CurrentPlayer), Move, NewGameState),
+                game_loop(NewGameState, GameConfig)
+            ;
+                write('Invalid move. Try again.'), nl,
+                game_loop(state(Board, CurrentPlayer), GameConfig)
+            )
         )
-    )
-).
+    ).
+

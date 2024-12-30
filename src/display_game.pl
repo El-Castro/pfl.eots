@@ -1,7 +1,8 @@
 display_game(state(Board, CurrentPlayer)) :-
     reverse(Board, ReversedBoard),  % Reverse the board to display it from bottom to top
-    print_board_rows(ReversedBoard, 8), nl, write('Current Player: '), write(CurrentPlayer), nl.
-
+    write('       -----------------------------------------------------------------'), nl,
+    print_board_rows(ReversedBoard, 8),
+    write('           1       2       3       4       5       6       7       8'), nl, nl.
 print_board_rows([], _).
 print_board_rows([Row|Rest], RowNumber) :-
     print_row(Row, RowNumber),
@@ -9,10 +10,19 @@ print_board_rows([Row|Rest], RowNumber) :-
     print_board_rows(Rest, NewRowNumber).
 
 print_row(Row, RowNumber) :-
-    write('Row '), write(RowNumber), write(': '),
-    print_pieces(Row), nl.
+    write('    '), write(RowNumber), write('  | '),
+    print_pieces(Row), nl,
+    write('       -----------------------------------------------------------------'), nl.
 
 print_pieces([]).
 print_pieces([Piece|Rest]) :-
-    write(Piece), write(' '),
+    ( Piece == white ->
+        format('\e[34m~w\e[0m | ', [Piece])  % Blue for white
+    ; Piece == black ->
+        format('\e[31m~w\e[0m | ', [Piece])  % Red for black
+    ; % Default color for other pieces (e.g., empty)
+        format('~w | ', [Piece])
+    ),
     print_pieces(Rest).
+
+
