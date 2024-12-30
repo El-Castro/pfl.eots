@@ -16,4 +16,4 @@ piece_remaining(Board, Player) :-
     member(Player, Row).
 
 print_winner(Winner) :-
-    write('Game Over! The winner is: '), write(Winner), nl.
+    write('       Game Over! The winner is: '), write(Winner), nl, nl.
