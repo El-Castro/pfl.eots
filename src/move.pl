@@ -36,6 +36,7 @@ replace(Board, Row, Col, Value, NewBoard) :-
     replace_in_list(OldRow, Col, Value, NewRow),
     replace_in_list(Board, Row, NewRow, NewBoard).
 
+
 % replace_in_list(+List, +Index, +Value, -NewList)
 replace_in_list([_|Tail], 1, Value, [Value|Tail]).
 replace_in_list([Head|Tail], Index, Value, [Head|NewTail]) :-
