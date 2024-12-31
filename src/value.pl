@@ -10,5 +10,21 @@ value(state(Board, CurrentPlayer), CurrentPlayer, Value) :-
     findall(_, (member(Row, Board), member(Opponent, Row)), OpponentPieces),
     length(OpponentPieces, OpponentCount),
     
-    % Calculate the value as the difference
-    Value is PlayerCount - OpponentCount.
+    % Calculate the difference in piece count and weight it heavily
+    PieceValue is 1000 * (OpponentCount - PlayerCount),
+    
+    % Calculate the coordinate-based value for opponent pieces
+    findall(
+        X + Y, 
+        (nth0(X, Board, Row), nth0(Y, Row, Opponent)), 
+        CoordinateValues
+    ),
+    sum_list(CoordinateValues, CoordinateValue),
+    
+    % Combine both values
+    Value is PieceValue + CoordinateValue.
+
+sum_list([], 0).
+sum_list([H|T], Sum) :-
+    sum_list(T, Rest),
+    Sum is H + Rest.
