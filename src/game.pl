@@ -1,6 +1,5 @@
 :- use_module(library(lists)).
 :- use_module(library(random)).
-:- use_module(library(ansi_term)).
 :- ensure_loaded('game_over.pl').
 :- ensure_loaded('valid_moves.pl').
 :- ensure_loaded('move.pl').
@@ -19,12 +18,19 @@ play :-
 
 
 game_menu :-
-    write('Welcome to Storm Clouds!'), nl, 
-    write('1. Human vs Human'),nl, 
-    write('2. Human vs PC'), nl, 
-    write('3. PC vs Human'), nl, 
-    write('4. PC vs PC'), nl, 
-    write('5. Exit'), nl.
+    nl, nl,
+    display_ascii_art,
+    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Welcome to Storm Clouds!'), nl,
+    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Choose the game type:'), nl,
+    write('       1. Human vs Human'),nl, 
+    write('       2. Human vs PC'), nl, 
+    write('       3. PC vs Human'), nl, 
+    write('       4. PC vs PC'), nl, 
+    write('       5. Exit'), nl,
+    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Enter your choice: ').
 
 
 read_choice(GameType) :-
@@ -37,8 +43,10 @@ initial_state(state(Board, white)) :-
 
 
 read_move(Move) :-
-    write('       Enter your move as move(Row, Col, Direction, NewRow, NewCol):'), read(Move), nl.
-
+    write('       Enter your move as move(X, Y, Direction): '), 
+    read(move(X, Y, Direction)), nl,
+    new_position(Y, X, Direction, NewY, NewX),  % Calculate the destination coordinates
+    Move = move(Y, X, Direction, NewY, NewX).  % Convert to the full move format.
 
 is_pc_player(white, game_config(player1(pc(Level)), _), Level).
 is_pc_player(black, game_config(_, player2(pc(Level))), Level).
@@ -49,6 +57,7 @@ game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
         nl,nl,nl, display_game(state(Board, CurrentPlayer)),
         print_winner(Winner)
     ;
+        write('       ---------------------------------------------------------------------------------------------------------------------'), nl, nl,
         write('       Turn: '), write(Turn), write(' - '), write(CurrentPlayer), write(' is now playing. '), nl, nl,
         display_game(state(Board, CurrentPlayer)),
 
@@ -63,7 +72,6 @@ game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
                 choose_move(state(Board, CurrentPlayer), Level, Move),
                 write('       Computer ('), write(CurrentPlayer), write(') chose: '), write(Move), nl, nl, nl
             ;
-                write('       Valid moves: '), write(ValidMoves), nl, nl,
                 read_move(Move)
             ),
             ( member(Move, ValidMoves) ->
