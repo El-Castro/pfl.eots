@@ -43,10 +43,16 @@ initial_state(state(Board, white)) :-
 
 
 read_move(Move) :-
-    write('       Enter your move as move(X, Y, Direction): '), 
-    read(move(X, Y, Direction)), nl,
-    new_position(Y, X, Direction, NewY, NewX),  % Calculate the destination coordinates
-    Move = move(Y, X, Direction, NewY, NewX).  % Convert to the full move format.
+    write('       Enter the coordinates of the piece to move:'), nl,
+    write('         Select X: '), 
+    read(Col),
+    write('         Select Y: '), 
+    read(Row),
+    write('       Direction to move: '), 
+    read(Direction),
+    new_position(Row, Col, Direction, NewRow, NewCol),
+    Move = move(Row, Col, Direction, NewRow, NewCol).
+
 
 is_pc_player(white, game_config(player1(pc(Level)), _), Level).
 is_pc_player(black, game_config(_, player2(pc(Level))), Level).
@@ -79,7 +85,9 @@ game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
                 NewTurn is Turn + 1,
                 game_loop(NewGameState, GameConfig, NewTurn)
             ;
-                write('       Invalid move. Try again.'), nl, nl,
+                nl, write('       ----------------------------'), nl,
+                write('       | Invalid move. Try again! |'), nl,
+                write('       ----------------------------'), nl, nl,
                 game_loop(state(Board, CurrentPlayer), GameConfig, Turn)
             )
         )
