@@ -48,7 +48,7 @@ read_move(Move) :-
     read(Col),
     write('         Select Y: '), 
     read(Row),
-    write('       Direction to move: '), 
+    write('       Direction to move (Ex:\'northwest\'): '), 
     read(Direction),
     new_position(Row, Col, Direction, NewRow, NewCol),
     Move = move(Row, Col, Direction, NewRow, NewCol).

@@ -55,20 +55,23 @@ new_position(Row, Col, west, NewRow, NewCol) :- NewRow is Row, NewCol is Col - 1
 new_position(Row, Col, northwest, NewRow, NewCol) :- NewRow is Row + 1, NewCol is Col - 1.
 
 
-% Check if the move is valid (is within the board boundaries and the destination is empty or can be captured depending on move type)
+% Check if the move is valid (is within the board boundaries and valid based on move type)
 is_valid_move(Board, Player, Row, Col, Direction) :-
     within_board(Row, Col),
     (
-        Direction \= south, % For non-capturing moves, ensure the destination is empty
-        \+ position_occupied(Board, Row, Col)
+        % Non-capturing move: Ensure the destination is empty and the direction is valid for non-capturing moves
+        (player_non_capturing_moves(Player, NonCapturingMoves),
+         member(Direction, NonCapturingMoves),
+         \+ position_occupied(Board, Row, Col))
     ;
-        Direction = south, % For capturing moves, ensure the destination has an opponents piece
-        opposite_player(Player, Opponent),
-        capture_valid(Board, Opponent, Row, Col)
+        % Capturing move: Ensure the destination has an opponents piece and the direction is valid for capturing moves
+        (player_capturing_moves(Player, CapturingMoves),
+         member(Direction, CapturingMoves),
+         opposite_player(Player, Opponent),
+         capture_valid(Board, Opponent, Row, Col))
     ).
 
 
-% Check if position is occupied
 position_occupied(Board, Row, Col) :-
     nth1(Row, Board, RowList),
     nth1(Col, RowList, Piece),
@@ -99,4 +102,13 @@ piece_position(Board, Player, Row, Col) :-
     nth1(Col, RowList, Piece),
     Piece == Player.
 
+% Define dynamic capturing and non-capturing moves based on the player
+player_non_capturing_moves(black, Moves) :-
+    black_non_capturing(Moves).
+player_non_capturing_moves(white, Moves) :-
+    white_non_capturing(Moves).
 
+player_capturing_moves(black, Moves) :-
+    black_capturing(Moves).
+player_capturing_moves(white, Moves) :-
+    white_capturing(Moves).

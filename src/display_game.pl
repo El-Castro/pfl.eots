@@ -3,7 +3,12 @@ display_game(state(Board, CurrentPlayer)) :-
     reverse(Board, ReversedBoard),  % Reverse the board to display it from bottom to top
     write('       -----------------------------------------------------------------'), nl,
     print_board_rows(ReversedBoard, 8),
-    write('           1       2       3       4       5       6       7       8'), nl, nl.
+    write('           1       2       3       4       5       6       7       8'), nl, nl,
+    value(state(Board, _), white, WhiteValue),
+    value(state(Board, _), black, BlackValue),
+    write('white value: '), write(WhiteValue), nl,
+    write('black value: '), write(BlackValue), nl.
+
 
 
 print_board_rows([], _).
