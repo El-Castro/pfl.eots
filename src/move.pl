@@ -19,7 +19,7 @@ switch_player(white, black).
 
 
 % execute_move(+Board, +Move, +Player, -NewBoard)
-execute_move(Board, move(Row, Col, Direction, NewRow, NewCol), Player, NewBoard) :-
+execute_move(Board, move(Row, Col, _, NewRow, NewCol), Player, NewBoard) :-
     % Set Colour based on the current player
     (Player == black -> Colour = black; Colour = white),
 

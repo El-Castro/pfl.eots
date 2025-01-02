@@ -1,5 +1,5 @@
 
-display_game(state(Board, CurrentPlayer)) :-
+display_game(state(Board, _)) :-
     reverse(Board, ReversedBoard),  % Reverse the board to display it from bottom to top
     write('       -----------------------------------------------------------------'), nl,
     print_board_rows(ReversedBoard, 8),
