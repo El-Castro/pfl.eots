@@ -1,4 +1,3 @@
-
 move(state(Board, CurrentPlayer), Move, state(NewBoard, NextPlayer)) :-
     % Step 1: Generate all valid moves
     valid_moves(state(Board, CurrentPlayer), ValidMoves),

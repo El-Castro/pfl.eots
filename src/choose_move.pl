@@ -1,4 +1,3 @@
-
 choose_move(state(Board, CurrentPlayer), 1, Move) :-
     valid_moves(state(Board, CurrentPlayer), ValidMoves),
     random_member(Move, ValidMoves).
