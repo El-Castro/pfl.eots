@@ -25,15 +25,16 @@ print_row(Row, RowNumber) :-
 
 
 print_pieces([]).
-print_pieces([Piece|Rest]) :-
-    ( Piece == white ->
-        format('\e[34m~w\e[0m | ', [Piece])  % Blue for white
-    ; Piece == black ->
-        format('\e[31m~w\e[0m | ', [Piece])  % Red for black
-    ; % Default color for other pieces (e.g., empty)
-        format('~w | ', [Piece])
-    ),
+print_pieces([white|Rest]) :-
+    format('\e[34m~w\e[0m | ', [white]),  % Blue for white
     print_pieces(Rest).
+print_pieces([black|Rest]) :-
+    format('\e[31m~w\e[0m | ', [black]),  % Red for black
+    print_pieces(Rest).
+print_pieces([Piece|Rest]) :-
+    format('~w | ', [Piece]),  % Default color
+    print_pieces(Rest).
+
 
 
 display_ascii_art :-

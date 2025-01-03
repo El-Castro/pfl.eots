@@ -20,14 +20,12 @@ switch_player(white, black).
 
 % execute_move(+Board, +Move, +Player, -NewBoard)
 execute_move(Board, move(Row, Col, _, NewRow, NewCol), Player, NewBoard) :-
-    % Set Colour based on the current player
-    (Player == black -> Colour = black; Colour = white),
 
     % Replace the current position with `empty`
     replace(Board, Row, Col, empty, TempBoard),
 
     % Place the players piece at the new position
-    replace(TempBoard, NewRow, NewCol, Colour, NewBoard).
+    replace(TempBoard, NewRow, NewCol, Player, NewBoard).
 
 
 % replace(+Board, +Row, +Col, +Value, -NewBoard)

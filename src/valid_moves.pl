@@ -5,16 +5,18 @@ white_non_capturing([east, northeast, north, northwest]).
 white_capturing([south, southeast, southwest, west]).
 
 
-valid_moves(state(Board, CurrentPlayer), ListOfMoves) :-
-    (CurrentPlayer == black -> 
-        black_non_capturing(NonCapturingMoves),
-        black_capturing(CapturingMoves),
-        find_all_moves(Board, black, NonCapturingMoves, CapturingMoves, ListOfMoves);
-    CurrentPlayer == white -> 
-        white_non_capturing(NonCapturingMoves),
-        white_capturing(CapturingMoves),
-        find_all_moves(Board, white, NonCapturingMoves, CapturingMoves, ListOfMoves)
-    ).
+% Define valid moves for black
+valid_moves(state(Board, black), ListOfMoves) :-
+    black_non_capturing(NonCapturingMoves),
+    black_capturing(CapturingMoves),
+    find_all_moves(Board, black, NonCapturingMoves, CapturingMoves, ListOfMoves).
+
+% Define valid moves for white
+valid_moves(state(Board, white), ListOfMoves) :-
+    white_non_capturing(NonCapturingMoves),
+    white_capturing(CapturingMoves),
+    find_all_moves(Board, white, NonCapturingMoves, CapturingMoves, ListOfMoves).
+
 
 
 % Find valid moves for player
@@ -55,21 +57,20 @@ new_position(Row, Col, west, NewRow, NewCol) :- NewRow is Row, NewCol is Col - 1
 new_position(Row, Col, northwest, NewRow, NewCol) :- NewRow is Row + 1, NewCol is Col - 1.
 
 
-% Check if the move is valid (is within the board boundaries and valid based on move type)
+% Check if the move is valid for non-capturing moves
 is_valid_move(Board, Player, Row, Col, Direction) :-
+    player_non_capturing_moves(Player, NonCapturingMoves),
+    member(Direction, NonCapturingMoves),
     within_board(Row, Col),
-    (
-        % Non-capturing move: Ensure the destination is empty and the direction is valid for non-capturing moves
-        (player_non_capturing_moves(Player, NonCapturingMoves),
-         member(Direction, NonCapturingMoves),
-         \+ position_occupied(Board, Row, Col))
-    ;
-        % Capturing move: Ensure the destination has an opponents piece and the direction is valid for capturing moves
-        (player_capturing_moves(Player, CapturingMoves),
-         member(Direction, CapturingMoves),
-         opposite_player(Player, Opponent),
-         capture_valid(Board, Opponent, Row, Col))
-    ).
+    \+ position_occupied(Board, Row, Col).
+
+% Check if the move is valid for capturing moves
+is_valid_move(Board, Player, Row, Col, Direction) :-
+    player_capturing_moves(Player, CapturingMoves),
+    member(Direction, CapturingMoves),
+    within_board(Row, Col),
+    opposite_player(Player, Opponent),
+    capture_valid(Board, Opponent, Row, Col).
 
 
 position_occupied(Board, Row, Col) :-
@@ -83,7 +84,7 @@ capture_valid(Board, Opponent, Row, Col) :-
     % Logic for validating capturing moves (need to ensure the piece is the opponent and the capture is valid)
     nth1(Row, Board, RowList),
     nth1(Col, RowList, Piece),
-    Piece == Opponent.
+    Piece = Opponent.
 
 
 % move is within board
@@ -100,7 +101,7 @@ opposite_player(white, black).
 piece_position(Board, Player, Row, Col) :-
     nth1(Row, Board, RowList),
     nth1(Col, RowList, Piece),
-    Piece == Player.
+    Piece = Player.
 
 % Define dynamic capturing and non-capturing moves based on the player
 player_non_capturing_moves(black, Moves) :-

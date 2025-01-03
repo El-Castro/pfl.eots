@@ -1,19 +1,21 @@
-game_over(state(Board, _), Winner) :-
-    (
-        % Check if black has no pieces left
-        \+ piece_remaining(Board, black),
-        Winner = white
-    ;
-        % Check if white has no pieces left
-        \+ piece_remaining(Board, white),
-        Winner = black
-    ;
-        fail
-    ).
+% Game over: Determine the winner if one player has no pieces left
+game_over(state(Board, _), white) :-
+    \+ piece_remaining(Board, black). % Black has no pieces left, white wins.
 
-piece_remaining(Board, Player) :-
-    member(Row, Board),
-    member(Player, Row).
+game_over(state(Board, _), black) :-
+    \+ piece_remaining(Board, white). % White has no pieces left, black wins.
 
-print_winner(Winner) :-
-    write('       Game Over! The winner is: '), write(Winner), nl, nl.
+% Check if a player has any pieces remaining
+piece_remaining([], _) :-
+    fail. % No pieces found in the empty board.
+
+piece_remaining([Row|_], Player) :-
+    member(Player, Row), % Players piece found in the current row.
+    !. % Stop further search if a piece is found.
+
+piece_remaining([_|Rest], Player) :-
+    piece_remaining(Rest, Player). % Check the remaining rows.
+
+
+print_winner(Winner, Turn) :-
+    write('       Game Over! '), write(Winner), write(' is victorious after '), write(Turn - 1), write(' turns!'), nl, nl.

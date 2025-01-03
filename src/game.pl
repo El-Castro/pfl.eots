@@ -34,9 +34,16 @@ game_menu :-
 
 
 read_choice(GameType) :-
-    read(Input), ( member(Input, [1,2,3,4]) -> GameType = Input ; 
-    write('Invalid choice'), fail ).
+    read(Input),
+    validate_choice(Input, GameType).
 
+validate_choice(1, 1).
+validate_choice(2, 2).
+validate_choice(3, 3).
+validate_choice(4, 4).
+validate_choice(_, GameType) :-
+    write('Invalid choice'), nl,
+    read_choice(GameType).
 
 initial_state(state(Board, white)) :-
     create_initial_board(Board).
@@ -58,37 +65,62 @@ is_pc_player(white, game_config(player1(pc(Level)), _), Level).
 is_pc_player(black, game_config(_, player2(pc(Level))), Level).
 
 
-game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
-    ( game_over(state(Board, CurrentPlayer), Winner) ->
-        nl,nl,nl, display_game(state(Board, CurrentPlayer)),
-        print_winner(Winner)
-    ;
-        write('       ---------------------------------------------------------------------------------------------------------------------'), nl, nl,
-        write('       Turn: '), write(Turn), write(' - '), write(CurrentPlayer), write(' is now playing. '), nl, nl,
-        display_game(state(Board, CurrentPlayer)),
 
-        valid_moves(state(Board, CurrentPlayer), ValidMoves),
-        ( ValidMoves = [] ->
-            write('       No valid moves available. Passing turn.'), nl, nl,
-            switch_player(CurrentPlayer, NextPlayer),
-            NewTurn is Turn + 1,
-            game_loop(state(Board, NextPlayer), GameConfig, NewTurn)
-        ;
-            ( is_pc_player(CurrentPlayer, GameConfig, Level) ->
-                choose_move(state(Board, CurrentPlayer), Level, Move),
-                write('       Computer ('), write(CurrentPlayer), write(') chose: '), write(Move), nl, nl, nl
-            ;
-                read_move(Move)
-            ),
-            ( member(Move, ValidMoves) ->
-                move(state(Board, CurrentPlayer), Move, NewGameState),
-                NewTurn is Turn + 1,
-                game_loop(NewGameState, GameConfig, NewTurn)
-            ;
-                nl, write('       ----------------------------'), nl,
-                write('       | Invalid move. Try again! |'), nl,
-                write('       ----------------------------'), nl, nl,
-                game_loop(state(Board, CurrentPlayer), GameConfig, Turn)
-            )
-        )
-    ).
+game_loop(state(Board, CurrentPlayer), _, Turn) :-
+    game_over(state(Board, CurrentPlayer), Winner),
+    !,
+    nl, nl, nl,
+    display_game(state(Board, CurrentPlayer)),
+    print_winner(Winner, Turn).
+
+
+game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
+    nl, write('       ---------------------------------------------------------------------------------------------------------------------'), nl, nl,
+    write('       Turn: '), write(Turn), write(' - '), write(CurrentPlayer), write(' is now playing. '), nl, nl,
+    display_game(state(Board, CurrentPlayer)),
+
+    valid_moves(state(Board, CurrentPlayer), ValidMoves),
+    handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn).
+
+
+% Handle case where no valid moves are available
+handle_moves(state(Board, CurrentPlayer), GameConfig, [], Turn) :-
+    write('       No valid moves available. Passing turn.'), nl, nl,
+    switch_player(CurrentPlayer, NextPlayer),
+    NewTurn is Turn + 1,
+    game_loop(state(Board, NextPlayer), GameConfig, NewTurn).
+
+
+% Handle case where valid moves exist and the current player is a computer
+handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
+    is_pc_player(CurrentPlayer, GameConfig, Level),
+    !,
+    choose_move(state(Board, CurrentPlayer), Level, Move),
+    write('       Computer ('), write(CurrentPlayer), write(') chose: '), write(Move), nl, nl, nl,
+    execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
+
+
+% Handle case where valid moves exist and the current player is human
+handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
+    \+ is_pc_player(CurrentPlayer, GameConfig, _),
+    !,
+    read_move(Move),
+    execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
+
+
+% Execute a valid move
+execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn) :-
+    member(Move, ValidMoves),
+    !,
+    move(state(Board, CurrentPlayer), Move, NewGameState),
+    NewTurn is Turn + 1,
+    game_loop(NewGameState, GameConfig, NewTurn).
+
+
+% Handle invalid move input
+execute_move(state(Board, CurrentPlayer), GameConfig, _Move, _ValidMoves, Turn) :-
+    nl, write('       ----------------------------'), nl,
+    write('       | Invalid move. Try again! |'), nl,
+    write('       ----------------------------'), nl, nl,
+    game_loop(state(Board, CurrentPlayer), GameConfig, Turn).
+
