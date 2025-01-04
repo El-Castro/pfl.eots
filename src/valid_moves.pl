@@ -1,3 +1,4 @@
+% Define valid directions for each player based on the rules of the game
 black_non_capturing([north, northeast, east, southeast]).
 black_capturing([south, southwest, west, northwest]).
 white_non_capturing([east, northeast, north, northwest]).
@@ -17,8 +18,7 @@ valid_moves(state(Board, white), ListOfMoves) :-
     find_all_moves(Board, white, NonCapturingMoves, CapturingMoves, ListOfMoves).
 
 
-
-% Find valid moves for player
+% Find all valid moves for a player based on the board state
 find_all_moves(Board, Player, NonCapturingMoves, CapturingMoves, ListOfMoves) :-
     findall(Move, (
         piece_position(Board, Player, Row, Col), % Find each pieces position
@@ -43,12 +43,12 @@ generate_capturing_moves(Row, Col, Directions, Board, Player, move(Row, Col, Dir
     member(Direction, Directions),
     generate_capturing_move_for_direction(Row, Col, Direction, Board, Player, NewRow, NewCol).
 
-% Generate multiple steps for capturing moves
+% Check a direction for capturing moves
 generate_capturing_move_for_direction(Row, Col, Direction, Board, Player, NewRow, NewCol) :-
     opposite_player(Player, Opponent),
     generate_capturing_move_in_direction(Row, Col, Direction, Board, Opponent, NewRow, NewCol).
 
-% Recursively check capturing moves in the given direction (Multiple steps)
+% Recursively check capturing moves in the given direction until a valid move is impossible
 generate_capturing_move_in_direction(Row, Col, Direction, Board, Opponent, NewRow, NewCol) :-
     new_position(Row, Col, Direction, TempRow, TempCol),  % Calculate new position
     within_board(TempRow, TempCol),  % Ensure the new position is within the board
@@ -79,13 +79,14 @@ is_valid_non_capturing_move(Board, _, Row, Col) :-
     within_board(Row, Col),
     \+ position_occupied(Board, Row, Col).  % Move must be to an empty square
 
+
 % Check if the move is valid for capturing moves
 is_valid_move(Board, Player, Row, Col, Direction) :-
     player_capturing_moves(Player, CapturingMoves),
     member(Direction, CapturingMoves),
     within_board(Row, Col),
     opposite_player(Player, Opponent),
-    capture_valid(Board, Opponent, Row, Col).
+    piece_position(Board, Opponent, Row, Col).
 
 
 % Check if a piece is on a given square
@@ -95,14 +96,7 @@ position_occupied(Board, Row, Col) :-
     Piece \== empty.
 
 
-% Check if the move is valid for capturing
-capture_valid(Board, Opponent, Row, Col) :-
-    nth1(Row, Board, RowList),
-    nth1(Col, RowList, Piece),
-    Piece = Opponent.
-
-
-% move is within board
+% Move is within board boundaries
 within_board(Row, Col) :-
     Row >= 1, Row =< 8, Col >= 1, Col =< 8.
 
@@ -112,11 +106,12 @@ opposite_player(black, white).
 opposite_player(white, black).
 
 
-% Example of piece positions on the board (find all positions of a given players pieces)
+% Check if a square has a piece of a given player (or empty)
 piece_position(Board, Player, Row, Col) :-
     nth1(Row, Board, RowList),
     nth1(Col, RowList, Piece),
     Piece = Player.
+
 
 % Define dynamic capturing and non-capturing moves based on the player
 player_non_capturing_moves(black, Moves) :-

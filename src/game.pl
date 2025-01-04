@@ -8,7 +8,7 @@
 :- ensure_loaded('value.pl').
 :- ensure_loaded('setup.pl').
 
-
+% Initialize the game
 play :-
     game_menu,
     read_choice(GameType),
@@ -17,6 +17,7 @@ play :-
     game_loop(GameState, GameConfig, 1).
 
 
+% Display the game menu
 game_menu :-
     nl, nl,
     display_ascii_art,
@@ -33,26 +34,36 @@ game_menu :-
     write('       Enter your choice: ').
 
 
+% Read the game type choice
 read_choice(GameType) :-
     read(Input),
     validate_choice(Input, GameType).
 
+
+% Validate the game type choice
 validate_choice(1, 1).
 validate_choice(2, 2).
 validate_choice(3, 3).
 validate_choice(4, 4).
+validate_choice(5, _) :-
+    halt.  % Exit the SICStus Prolog terminal
 validate_choice(_, GameType) :-
-    write('Invalid choice'), nl,
+    write('       Invalid choice. Try Again.'), nl,
+    write('       '),
     read_choice(GameType).
 
+
+% Setup the initial board state
 initial_state(_, state(Board, white)) :-
     create_initial_board(Board).
 
 
+% Check if a player is a computer based on the game configuration
 is_pc_player(white, game_config(player1(pc(Level)), _), Level).
 is_pc_player(black, game_config(_, player2(pc(Level))), Level).
 
 
+% Game loop for the game over state
 game_loop(state(Board, CurrentPlayer), _, Turn) :-
     game_over(state(Board, CurrentPlayer), Winner),
     !,
@@ -60,23 +71,21 @@ game_loop(state(Board, CurrentPlayer), _, Turn) :-
     display_game(state(Board, CurrentPlayer)),
     print_winner(Winner, Turn).
 
-
+% Game loop for the normal game state
 game_loop(state(Board, CurrentPlayer), GameConfig, Turn) :-
     nl, write('       ---------------------------------------------------------------------------------------------------------------------'), nl, nl,
     write('       Turn: '), write(Turn), write(' - '), write(CurrentPlayer), write(' is now playing. '), nl, nl,
     display_game(state(Board, CurrentPlayer)),
-
     valid_moves(state(Board, CurrentPlayer), ValidMoves),
     handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn).
 
 
-% Handle case where no valid moves are available
+% Handle case where no valid moves are available for the current player
 handle_moves(state(Board, CurrentPlayer), GameConfig, [], Turn) :-
     write('       No valid moves available. Passing turn.'), nl, nl,
     switch_player(CurrentPlayer, NextPlayer),
     NewTurn is Turn + 1,
     game_loop(state(Board, NextPlayer), GameConfig, NewTurn).
-
 
 % Handle case where valid moves exist and the current player is a computer
 handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
@@ -84,24 +93,23 @@ handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     !,
     choose_move(state(Board, CurrentPlayer), Level, Move),
     display_pc_move(Move, CurrentPlayer),
-    execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
-
+    confirm_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 % Handle case where valid moves exist and the current player is human
 handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     \+ is_pc_player(CurrentPlayer, GameConfig, _),
     !,
     choose_move(state(Board, CurrentPlayer), 0, Move),
-    execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
+    confirm_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 
 % Execute a valid move
-execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn) :-
+confirm_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn) :-
     member(Move, ValidMoves), !,
     move(state(Board, CurrentPlayer), Move, NewGameState),
     NewTurn is Turn + 1,
     game_loop(NewGameState, GameConfig, NewTurn).
 
-
+% Print a message describing the computer move
 display_pc_move(move(Y, X, Direction, NewY, NewX), CurrentPlayer) :-
     write('       Computer ('), write(CurrentPlayer), write(') moved ('), write(X), write(','), write(Y), write(') towards '), write(Direction), write(' ('), write(NewX), write(','), write(NewY), write(').'), nl, nl, nl.

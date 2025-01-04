@@ -1,3 +1,4 @@
+% Create initial board
 create_initial_board(Board) :-
 Board = [
     [empty, empty, white, white, white, white, white, white],
@@ -10,8 +11,10 @@ Board = [
     [black, black, empty, empty, empty, empty, empty, empty]
 ].
 
+% Game configuration
 game_config(player1(type), player2(type)).
 
+% Setup game configuration based on user input
 setup_game_config(1, game_config(player1(human), player2(human))).
 setup_game_config(2, game_config(player1(human), player2(pc(Level)))) :-
     write('       Choose difficulty level for PC (1 or 2): '), read(Level), nl.
