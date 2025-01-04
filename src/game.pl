@@ -10,19 +10,18 @@
 
 % Initialize the game
 play :-
-    game_menu,
+    start_color_menu,
+    read_color_choice(StartingColor),
+    game_type_menu,
     read_choice(GameType),
-    setup_game_config(GameType, GameConfig),
+    setup_game_config(GameType, StartingColor, GameConfig),
     initial_state(GameConfig, GameState),
     game_loop(GameState, GameConfig, 1).
 
 
-% Display the game menu
-game_menu :-
+% Display the game type menu
+game_type_menu :-
     nl, nl,
-    display_ascii_art,
-    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
-    write('       Welcome to Storm Clouds!'), nl,
     write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Choose the game type:'), nl,
     write('       1. Human vs Human'),nl, 
@@ -34,11 +33,30 @@ game_menu :-
     write('       Enter your choice: ').
 
 
+% Display the starting color menu
+start_color_menu :-
+    nl, nl,
+    display_ascii_art,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Welcome to Storm Clouds!'), nl,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Choose the starting color:'), nl,
+    write('       1. White'),nl, 
+    write('       2. Black'), nl,
+    write('       3. Exit'), nl,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
+    write('       Enter your choice: ').
+
+
 % Read the game type choice
 read_choice(GameType) :-
     read(Input),
     validate_choice(Input, GameType).
 
+% Read the starting color choice
+read_color_choice(StartingColor) :-
+    read(Input),
+    validate_color_choice(Input, StartingColor).
 
 % Validate the game type choice
 validate_choice(1, 1).
@@ -53,8 +71,19 @@ validate_choice(_, GameType) :-
     read_choice(GameType).
 
 
+% Validate the starting color choice
+validate_color_choice(1, 1).
+validate_color_choice(2, 2).
+validate_color_choice(3, _) :-
+    halt.  % Exit the SICStus Prolog terminal
+validate_color_choice(_, StartingColor) :-
+    write('       Invalid choice. Try Again.'), nl,
+    write('       '),
+    read_color_choice(StartingColor).
+
+
 % Setup the initial board state
-initial_state(_, state(Board, white)) :-
+initial_state(game_config(_, _, Color), state(Board, Color)) :-
     create_initial_board(Board).
 
 
