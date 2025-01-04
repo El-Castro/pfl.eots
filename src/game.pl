@@ -20,16 +20,16 @@ play :-
 game_menu :-
     nl, nl,
     display_ascii_art,
-    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Welcome to Storm Clouds!'), nl,
-    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Choose the game type:'), nl,
     write('       1. Human vs Human'),nl, 
     write('       2. Human vs PC'), nl, 
     write('       3. PC vs Human'), nl, 
     write('       4. PC vs PC'), nl, 
     write('       5. Exit'), nl,
-    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Enter your choice: ').
 
 
@@ -49,16 +49,15 @@ initial_state(state(Board, white)) :-
     create_initial_board(Board).
 
 
-read_move(Move) :-
+read_move(Row, Col, Direction) :-
     write('       Enter the coordinates of the piece to move:'), nl,
     write('         Select X: '), 
     read(Col),
     write('         Select Y: '), 
     read(Row),
     write('       Direction to move (Ex:\'northwest\'): '), 
-    read(Direction),
-    new_position(Row, Col, Direction, NewRow, NewCol),
-    Move = move(Row, Col, Direction, NewRow, NewCol).
+    read(Direction).
+
 
 
 is_pc_player(white, game_config(player1(pc(Level)), _), Level).
@@ -104,7 +103,8 @@ handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
 handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     \+ is_pc_player(CurrentPlayer, GameConfig, _),
     !,
-    read_move(Move),
+    read_move(Row, Col, Direction),
+    fetch_move(Row, Col, Direction, ValidMoves, Move),
     execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 
@@ -127,3 +127,7 @@ execute_move(state(Board, CurrentPlayer), GameConfig, _Move, _ValidMoves, Turn) 
 
 display_move(move(Y, X, Direction, NewY, NewX), CurrentPlayer) :-
     write('       Computer ('), write(CurrentPlayer), write(') moved ('), write(X), write(','), write(Y), write(') towards '), write(Direction), write(' ('), write(NewX), write(','), write(NewY), write(').'), nl, nl, nl.
+
+fetch_move(Row, Col, Direction, ValidMoves, Move) :-
+    member(Move, ValidMoves), % Check if Move is in the list of valid moves
+    Move = move(Row, Col, Direction, _, _). % Ensure it matches the given Row, Col, and Direction
