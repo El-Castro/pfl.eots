@@ -20,16 +20,16 @@ play :-
 game_menu :-
     nl, nl,
     display_ascii_art,
-    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
     write('       Welcome to Storm Clouds!'), nl,
-    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
     write('       Choose the game type:'), nl,
     write('       1. Human vs Human'),nl, 
     write('       2. Human vs PC'), nl, 
     write('       3. PC vs Human'), nl, 
     write('       4. PC vs PC'), nl, 
     write('       5. Exit'), nl,
-    write('       ---------------------------------------------------------------------------------------------------------------------'), nl,
+    write('       -------------------------------------------------------------------------------------------------------------------'), nl,
     write('       Enter your choice: ').
 
 
@@ -96,7 +96,7 @@ handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     is_pc_player(CurrentPlayer, GameConfig, Level),
     !,
     choose_move(state(Board, CurrentPlayer), Level, Move),
-    write('       Computer ('), write(CurrentPlayer), write(') chose: '), write(Move), nl, nl, nl,
+    display_move(Move, CurrentPlayer),
     execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 
@@ -124,3 +124,6 @@ execute_move(state(Board, CurrentPlayer), GameConfig, _Move, _ValidMoves, Turn) 
     write('       ----------------------------'), nl, nl,
     game_loop(state(Board, CurrentPlayer), GameConfig, Turn).
 
+
+display_move(move(Y, X, Direction, NewY, NewX), CurrentPlayer) :-
+    write('       Computer ('), write(CurrentPlayer), write(') moved ('), write(X), write(','), write(Y), write(') towards '), write(Direction), write(' ('), write(NewX), write(','), write(NewY), write(').'), nl, nl, nl.
