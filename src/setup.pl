@@ -6,8 +6,8 @@ Board = [
     [black, black, empty, empty, empty, empty, empty, empty],
     [black, black, empty, empty, empty, empty, empty, empty],
     [black, black, empty, empty, empty, empty, empty, empty],
-    [black, black, empty, empty, empty, empty, empty, empty],
-    [black, black, empty, empty, empty, empty, empty, empty]
+    [empty, empty, empty, empty, empty, empty, empty, empty],
+    [white, empty, empty, empty, empty, empty, empty, empty]
 ].
 
 game_config(player1(type), player2(type)).

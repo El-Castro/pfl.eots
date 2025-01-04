@@ -1,4 +1,3 @@
-
 black_non_capturing([north, northeast, east, southeast]).
 black_capturing([south, southwest, west, northwest]).
 white_non_capturing([east, northeast, north, northwest]).
@@ -53,13 +52,15 @@ generate_capturing_move_for_direction(Row, Col, Direction, Board, Player, NewRow
 generate_capturing_move_in_direction(Row, Col, Direction, Board, Opponent, NewRow, NewCol) :-
     new_position(Row, Col, Direction, TempRow, TempCol),  % Calculate new position
     within_board(TempRow, TempCol),  % Ensure the new position is within the board
-    (   piece_position(Board, Opponent, TempRow, TempCol)  % If opponents piece, capture
-    ->  NewRow = TempRow,
-        NewCol = TempCol  % Bind the destination coordinates
-    ;   piece_position(Board, empty, TempRow, TempCol)  % If empty square, continue checking
-    ->  generate_capturing_move_in_direction(TempRow, TempCol, Direction, Board, Opponent, NewRow, NewCol)
-    ).
-
+    piece_position(Board, Opponent, TempRow, TempCol),
+    NewRow = TempRow,
+    NewCol = TempCol.
+   
+generate_capturing_move_in_direction(Row, Col, Direction, Board, Opponent, NewRow, NewCol) :-
+    new_position(Row, Col, Direction, TempRow, TempCol),  % Calculate new position
+    within_board(TempRow, TempCol),  % Ensure the new position is within the board
+    piece_position(Board, empty, TempRow, TempCol),
+    generate_capturing_move_in_direction(TempRow, TempCol, Direction, Board, Opponent, NewRow, NewCol).
 
 
 % New position based on direction
