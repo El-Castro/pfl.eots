@@ -13,7 +13,7 @@ play :-
     game_menu,
     read_choice(GameType),
     setup_game_config(GameType, GameConfig),
-    initial_state(GameState),
+    initial_state(GameConfig, GameState),
     game_loop(GameState, GameConfig, 1).
 
 
@@ -45,24 +45,12 @@ validate_choice(_, GameType) :-
     write('Invalid choice'), nl,
     read_choice(GameType).
 
-initial_state(state(Board, white)) :-
+initial_state(_, state(Board, white)) :-
     create_initial_board(Board).
-
-
-read_move(Row, Col, Direction) :-
-    write('       Enter the coordinates of the piece to move:'), nl,
-    write('         Select X: '), 
-    read(Col),
-    write('         Select Y: '), 
-    read(Row),
-    write('       Direction to move (Ex:\'northwest\'): '), 
-    read(Direction).
-
 
 
 is_pc_player(white, game_config(player1(pc(Level)), _), Level).
 is_pc_player(black, game_config(_, player2(pc(Level))), Level).
-
 
 
 game_loop(state(Board, CurrentPlayer), _, Turn) :-
@@ -95,7 +83,7 @@ handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     is_pc_player(CurrentPlayer, GameConfig, Level),
     !,
     choose_move(state(Board, CurrentPlayer), Level, Move),
-    display_move(Move, CurrentPlayer),
+    display_pc_move(Move, CurrentPlayer),
     execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 
@@ -103,31 +91,17 @@ handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
 handle_moves(state(Board, CurrentPlayer), GameConfig, ValidMoves, Turn) :-
     \+ is_pc_player(CurrentPlayer, GameConfig, _),
     !,
-    read_move(Row, Col, Direction),
-    fetch_move(Row, Col, Direction, ValidMoves, Move),
+    choose_move(state(Board, CurrentPlayer), 0, Move),
     execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn).
 
 
 % Execute a valid move
 execute_move(state(Board, CurrentPlayer), GameConfig, Move, ValidMoves, Turn) :-
-    member(Move, ValidMoves),
-    !,
+    member(Move, ValidMoves), !,
     move(state(Board, CurrentPlayer), Move, NewGameState),
     NewTurn is Turn + 1,
     game_loop(NewGameState, GameConfig, NewTurn).
 
 
-% Handle invalid move input
-execute_move(state(Board, CurrentPlayer), GameConfig, _Move, _ValidMoves, Turn) :-
-    nl, write('       ----------------------------'), nl,
-    write('       | Invalid move. Try again! |'), nl,
-    write('       ----------------------------'), nl, nl,
-    game_loop(state(Board, CurrentPlayer), GameConfig, Turn).
-
-
-display_move(move(Y, X, Direction, NewY, NewX), CurrentPlayer) :-
+display_pc_move(move(Y, X, Direction, NewY, NewX), CurrentPlayer) :-
     write('       Computer ('), write(CurrentPlayer), write(') moved ('), write(X), write(','), write(Y), write(') towards '), write(Direction), write(' ('), write(NewX), write(','), write(NewY), write(').'), nl, nl, nl.
-
-fetch_move(Row, Col, Direction, ValidMoves, Move) :-
-    member(Move, ValidMoves), % Check if Move is in the list of valid moves
-    Move = move(Row, Col, Direction, _, _). % Ensure it matches the given Row, Col, and Direction

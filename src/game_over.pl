@@ -18,4 +18,5 @@ piece_remaining([_|Rest], Player) :-
 
 
 print_winner(Winner, Turn) :-
-    write('       Game Over! '), write(Winner), write(' is victorious after '), write(Turn - 1), write(' turns!'), nl, nl.
+    NoTurns is Turn - 1,
+    write('       Game Over! '), write(Winner), write(' is victorious after '), write(NoTurns), write(' turns!'), nl, nl.
