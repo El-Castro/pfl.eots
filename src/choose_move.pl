@@ -23,9 +23,14 @@ choose_human_move_attempt(ValidMoves, Move) :-
 
 % Retry if the move is invalid
 choose_human_move_attempt(ValidMoves, Move) :-
-    nl, write('       ----------------------------'), nl,
-    write('       | Invalid move. Try again! |'), nl,
-    write('       ----------------------------'), nl, nl,
+    nl, write('       ----------------------------------------------------------------'), nl,
+    write('       | Invalid move. Try again!                                     |'), nl,
+    write('       ----------------------------------------------------------------'), nl,
+    write('       | White non-capturing moves: east, northeast, north, northwest |'), nl,
+    write('       | White capturing moves: south, southeast, southwest, west     |'), nl,
+    write('       | Black non-capturing moves: north, northeast, east, southeast |'), nl,
+    write('       | Black capturing moves: south, southwest, west, northwest     |'), nl,
+    write('       ----------------------------------------------------------------'), nl, nl,
     choose_human_move_attempt(ValidMoves, Move).
 
 

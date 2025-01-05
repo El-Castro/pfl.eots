@@ -6,8 +6,8 @@ display_game(state(Board, _)) :-
     write('           1       2       3       4       5       6       7       8'), nl, nl,
     value(state(Board, _), white, WhiteValue),
     value(state(Board, _), black, BlackValue),
-    write('white value: '), write(WhiteValue), nl,
-    write('black value: '), write(BlackValue), nl.
+    write('       white value: '), write(WhiteValue), nl,
+    write('       black value: '), write(BlackValue), nl, nl.
 
 
 % Print the rows of the board
