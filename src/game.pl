@@ -23,6 +23,12 @@ game_menu :-
     display_ascii_art,
     write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Welcome to Storm Clouds!'), nl,
+    write('       Each player takes turns moving their pieces. The goal is to eliminate all opponent pieces.'), nl,
+    write('       Moves are divided into non-capturing and capturing:'), nl,
+    write('         - White non-capturing moves: east, northeast, north, northwest'), nl,
+    write('         - White capturing moves: south, southeast, southwest, west'), nl,
+    write('         - Black non-capturing moves: north, northeast, east, southeast'), nl,
+    write('         - Black capturing moves: south, southwest, west, northwest'), nl,
     write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Choose the game type:'), nl,
     write('       1. Human vs Human'),nl, 
@@ -32,6 +38,7 @@ game_menu :-
     write('       5. Exit'), nl,
     write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Enter your choice: ').
+
 
 
 % Read the game type choice
