@@ -24,7 +24,7 @@ game_menu :-
     write('       -----------------------------------------------------------------------------------------------------------------'), nl,
     write('       Welcome to Storm Clouds!'), nl,
     write('       Each player takes turns moving their pieces. The goal is to eliminate all opponent pieces.'), nl,
-    write('       Moves are divided into non-capturing and capturing:'), nl,
+    write('       Moves are divided into non-capturing (like a chess king) and capturing (like a chess queen):'), nl,
     write('         - White non-capturing moves: east, northeast, north, northwest'), nl,
     write('         - White capturing moves: south, southeast, southwest, west'), nl,
     write('         - Black non-capturing moves: north, northeast, east, southeast'), nl,
